@@ -17,8 +17,6 @@ from . import Charts
 # from . import Database
 # from . import ML_Analysis
 from . import TMFG_Analysis
-import scipy
-
 
 
 
