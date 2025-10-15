@@ -3,7 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import networkx as nx
 import scipy
-import Charts
+from . import Charts
 import yfinance as yf
 # import riskfolio as rf
 
@@ -25,8 +25,8 @@ def get_weight_mat(stock_list: list[str], begin_data_date: str, cutoff: str):
         # Remove some recent data to analyze profits in the past
         cutoff_date = pd.to_datetime(cutoff)
         begin_data_date = pd.to_datetime(begin_data_date) 
-        df = df.loc[pd.to_datetime(df['Date']) <= cutoff_date]
-        df = df.loc[pd.to_datetime(df['Date']) >= begin_data_date]
+        df = df.loc[df.index <= cutoff_date]
+        df = df.loc[df.index >= begin_data_date]
         # Calculate daily percent change for a stock and add it as a new column to df.
         df['Percent Change'] = ((df['Close'] - df['Open']) / df['Open']) * 100
         # Store percent changes into a single DataFrame, with each column representing a different stock.
