@@ -2,6 +2,7 @@ from pydantic import BaseModel, Field
 from typing import List, Optional, Dict, Any
 
 class SimRequest(BaseModel):
+    sims: int
     stocks: List[str]
     date1: Optional[str] = Field(None, description="YYYY-MM-DD")
     date2: Optional[str] = Field(None, description="YYYY-MM-DD")
