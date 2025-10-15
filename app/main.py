@@ -57,7 +57,7 @@ async def simulate(info: SimRequest, request: Request, debug: int = 0):
         logger.info("simulate input: %s ...", tickers[:5] + (["…"] if len(tickers) > 5 else []))
 
         message, summary, tmfg_b64, dual_b64 = simulate_dual(
-            1, 1, tickers, info.date1, info.date2, info.date3, info.date4
+            info.sims, 1, tickers, info.date1, info.date2, info.date3, info.date4
         )
 
         # sanity checks so we never return None
