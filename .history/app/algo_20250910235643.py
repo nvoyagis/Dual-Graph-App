@@ -99,15 +99,16 @@ def simulate_dual(sims: int, seed: int, stocks: list[str], begin_data_date: str,
     stock_percent_changes = {}
     stock_dfs = {}
     for s in stocks:
-        df = yf.download(s, start="1970-01-02", end=pd.Timestamp(sell2)+pd.Timedelta(days=1), interval="1d")
+        df = yf.download(s, start="1970-01-02", end=sell2, interval="1d")
+
+        df = df.loc[df.index <= sell2]
         df = df.loc[df.index >= begin_data_date]
-        
-        print(df)
         stock_dfs[s] = df
-        # df = df.loc[df.index <= buy_date]
-        open_value = df.loc[begin_data_date, 'Open']
-        close_value = df.loc[buy_date, 'Close']
-        stock_percent_changes[s] = (close_value.item() - open_value.item()) / open_value.item() * 100
+        df = df.loc[df.index <= buy_date]
+        df.set_index('Date', inplace=True)
+        open_value = df.loc[pd.Timestamp(begin_data_date), 'Open']
+        close_value = df.loc[pd.Timestamp(buy_date), 'Close']
+        stock_percent_changes[s] = (close_value - open_value) / open_value * 100
 
     g = nx.relabel_nodes(g, stock_dict)
     # Assign weights (percent changes) to nodes/stocks
@@ -298,7 +299,6 @@ def simulate_dual(sims: int, seed: int, stocks: list[str], begin_data_date: str,
     print(filtered_sell_df)
     valid_dates = filtered_sell_df.index
 
-
     # Create dictionaries to store information about portfolios
     SPX_wins = {}
     avg_returns_dict = {}
@@ -398,7 +398,7 @@ def simulate_dual(sims: int, seed: int, stocks: list[str], begin_data_date: str,
         for i in range(sims):
             # Pick a sell random date
             random_sell_date = np.random.choice(valid_dates)
-            random_sell_date = pd.to_datetime(np.random.choice(valid_dates)).strftime('%Y-%m-%d')
+            target_date2 = pd.Timestamp(random_sell_date)
 
             percent_changes = pd.DataFrame()
             random_period_percent_changes = []
@@ -407,13 +407,14 @@ def simulate_dual(sims: int, seed: int, stocks: list[str], begin_data_date: str,
 
                 # Set Date as index
                 df.set_index('Date', inplace=True)
-                print(df)
-                print(df.loc[random_sell_date])
+
+                # Use pd.Timestamp for the date lookup
+                target_date1 = pd.Timestamp(buy_date)
 
                 # Get the opening value for a specific date
-                open_value = df.loc[buy_date, 'Open']
-                close_value = df.loc[random_sell_date, 'Close']
-                random_period_percent_changes.append((close_value.item() - open_value.item())/open_value.item() * 100)
+                open_value = df.loc[target_date1, 'Open']
+                close_value = df.loc[target_date2, 'Close']
+                random_period_percent_changes.append((close_value - open_value)/open_value * 100)
 
                 # Change Date back into a column so it can be accessed as normal
                 df.reset_index(inplace=True)
@@ -424,8 +425,6 @@ def simulate_dual(sims: int, seed: int, stocks: list[str], begin_data_date: str,
                 df['Percent Change'] = ((df['Close'] - df['Open']) / df['Open']) * 100
                 # Store percent changes into a single DataFrame, with each column representing a different stock.
                 percent_changes[s] = df['Percent Change']
-                print(df)
-                print(percent_changes)
             
             random_period_portfolio_percent_change = 0
             for i in range(len(random_period_percent_changes)):
@@ -453,6 +452,7 @@ def simulate_dual(sims: int, seed: int, stocks: list[str], begin_data_date: str,
             open_value = df.loc[target_date1, 'Open']
             close_value = df.loc[target_date2, 'Close']
             SPX_percent_change = (close_value - open_value)/open_value * 100
+
             if random_period_portfolio_percent_change > SPX_percent_change:
                 SPX_beat_count += 1
             triad_percent_changes.append(random_period_portfolio_percent_change)
@@ -860,5 +860,6 @@ def simulate_dual(sims: int, seed: int, stocks: list[str], begin_data_date: str,
     # Graphing.tmfg_single_bar_graph(TMFG_pagerank, 'Pagerank')
 
 
-stocks = ['DIS', 'KO', 'ADBE', 'MRK', 'KMI', 'AAPL', 'JNJ', 'CVS', 'COST', 'T', 'BA', 'EA', 'HAS', 'HD', 'HSY', 'LLY', 'NFLX', 'NKE', 'V', 'JPM']
+stocks = ['DIS', 'KO', 'ADBE', 'MRK', 'KMI', 'AAPL', 'JNJ', 'CVS', 'COST', 'T', 'BA', 'EA', 'HAS', 'HD', 'HSY', 'LLY', 'NFLX', 'NKE', 'V', 'JPM', 'FDX', 'KR', 'KHC', 'LULU', 'MA', 'BBY', 'GOOG', 'ALL', 'KMX', 'MNST', 
+          'AZO', 'COF', 'WFC', 'XOM', 'CVX', 'MAR', 'MCD', 'ORCL']
 simulate_dual(5, 1, stocks, '2023-01-03', '2023-01-31', '2023-02-01', '2023-02-28')

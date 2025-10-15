@@ -99,12 +99,12 @@ def simulate_dual(sims: int, seed: int, stocks: list[str], begin_data_date: str,
     stock_percent_changes = {}
     stock_dfs = {}
     for s in stocks:
-        df = yf.download(s, start="1970-01-02", end=pd.Timestamp(sell2)+pd.Timedelta(days=1), interval="1d")
+        df = yf.download(s, start="1970-01-02", end=sell2, interval="1d")
+
+        df = df.loc[df.index <= sell2]
         df = df.loc[df.index >= begin_data_date]
-        
-        print(df)
         stock_dfs[s] = df
-        # df = df.loc[df.index <= buy_date]
+        df = df.loc[df.index <= buy_date]
         open_value = df.loc[begin_data_date, 'Open']
         close_value = df.loc[buy_date, 'Close']
         stock_percent_changes[s] = (close_value.item() - open_value.item()) / open_value.item() * 100
@@ -298,7 +298,6 @@ def simulate_dual(sims: int, seed: int, stocks: list[str], begin_data_date: str,
     print(filtered_sell_df)
     valid_dates = filtered_sell_df.index
 
-
     # Create dictionaries to store information about portfolios
     SPX_wins = {}
     avg_returns_dict = {}
@@ -398,7 +397,7 @@ def simulate_dual(sims: int, seed: int, stocks: list[str], begin_data_date: str,
         for i in range(sims):
             # Pick a sell random date
             random_sell_date = np.random.choice(valid_dates)
-            random_sell_date = pd.to_datetime(np.random.choice(valid_dates)).strftime('%Y-%m-%d')
+            target_date2 = pd.Timestamp(random_sell_date)
 
             percent_changes = pd.DataFrame()
             random_period_percent_changes = []
@@ -407,12 +406,16 @@ def simulate_dual(sims: int, seed: int, stocks: list[str], begin_data_date: str,
 
                 # Set Date as index
                 df.set_index('Date', inplace=True)
-                print(df)
-                print(df.loc[random_sell_date])
+
+                # Use pd.Timestamp for the date lookup
+                target_date1 = pd.Timestamp(buy_date)
+                print(target_date1)
+                print(target_date2)
+                print(date_dict)
 
                 # Get the opening value for a specific date
-                open_value = df.loc[buy_date, 'Open']
-                close_value = df.loc[random_sell_date, 'Close']
+                open_value = df.loc[target_date1, 'Open']
+                close_value = df.loc[target_date2, 'Close']
                 random_period_percent_changes.append((close_value.item() - open_value.item())/open_value.item() * 100)
 
                 # Change Date back into a column so it can be accessed as normal

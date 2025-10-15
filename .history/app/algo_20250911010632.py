@@ -99,12 +99,12 @@ def simulate_dual(sims: int, seed: int, stocks: list[str], begin_data_date: str,
     stock_percent_changes = {}
     stock_dfs = {}
     for s in stocks:
-        df = yf.download(s, start="1970-01-02", end=pd.Timestamp(sell2)+pd.Timedelta(days=1), interval="1d")
+        df = yf.download(s, start="1970-01-02", end=sell2, interval="1d")
+
+        df = df.loc[df.index <= sell2]
         df = df.loc[df.index >= begin_data_date]
-        
-        print(df)
         stock_dfs[s] = df
-        # df = df.loc[df.index <= buy_date]
+        df = df.loc[df.index <= buy_date]
         open_value = df.loc[begin_data_date, 'Open']
         close_value = df.loc[buy_date, 'Close']
         stock_percent_changes[s] = (close_value.item() - open_value.item()) / open_value.item() * 100
@@ -297,7 +297,6 @@ def simulate_dual(sims: int, seed: int, stocks: list[str], begin_data_date: str,
     filtered_sell_df.set_index('Date', inplace=True)
     print(filtered_sell_df)
     valid_dates = filtered_sell_df.index
-
 
     # Create dictionaries to store information about portfolios
     SPX_wins = {}

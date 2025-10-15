@@ -99,8 +99,10 @@ def simulate_dual(sims: int, seed: int, stocks: list[str], begin_data_date: str,
     stock_percent_changes = {}
     stock_dfs = {}
     for s in stocks:
-        df = yf.download(s, start="1970-01-02", end=pd.Timestamp(sell2)+pd.Timedelta(days=1), interval="1d")
-        df = df.loc[df.index >= begin_data_date]
+        df = yf.download(s, start="1970-01-02", end=sell2, interval="1d")
+
+        df = df.loc[df.index <= sell2]
+        df = df.loc[df.index >= pd.Timestamp(buy_date) + pd.Timedelta(days=1)]
         
         print(df)
         stock_dfs[s] = df

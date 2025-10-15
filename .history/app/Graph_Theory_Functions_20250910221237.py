@@ -22,11 +22,13 @@ def get_weight_mat(stock_list: list[str], begin_data_date: str, cutoff: str):
         df = pd.read_csv(f'app/Data2015-2025/HistoricalPrices 2015 - 2025, {stock}.csv', parse_dates=['Date'], date_format='%m/%d/%Y')
         df = yf.download(stock, start=begin_data_date, end=cutoff, interval="1d")
         print(df)
+        # Remove spaces in column names.
+        df.columns = df.columns.str.strip()
         # Remove some recent data to analyze profits in the past
         cutoff_date = pd.to_datetime(cutoff)
         begin_data_date = pd.to_datetime(begin_data_date) 
-        df = df.loc[df.index <= cutoff_date]
-        df = df.loc[df.index >= begin_data_date]
+        df = df[pd.to_datetime(df['Date']) <= cutoff_date]
+        df = df[pd.to_datetime(df['Date']) >= begin_data_date]
         # Calculate daily percent change for a stock and add it as a new column to df.
         df['Percent Change'] = ((df['Close'] - df['Open']) / df['Open']) * 100
         # Store percent changes into a single DataFrame, with each column representing a different stock.

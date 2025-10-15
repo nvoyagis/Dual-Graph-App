@@ -100,6 +100,8 @@ def simulate_dual(sims: int, seed: int, stocks: list[str], begin_data_date: str,
     stock_dfs = {}
     for s in stocks:
         df = yf.download(s, start="1970-01-02", end=pd.Timestamp(sell2)+pd.Timedelta(days=1), interval="1d")
+
+        df = df.loc[df.index <= pd.Timestamp(sell2) + pd.Timedelta(days=1)]
         df = df.loc[df.index >= begin_data_date]
         
         print(df)
