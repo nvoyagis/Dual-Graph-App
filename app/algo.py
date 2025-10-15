@@ -7,8 +7,8 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 # import matplotlib.colors as colors
 import fast_tmfg
-import Graph_Theory_Functions
 import Dual
+import Graph_Theory_Functions
 import os
 import time
 from itertools import combinations

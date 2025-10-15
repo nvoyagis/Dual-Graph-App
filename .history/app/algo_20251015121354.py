@@ -7,8 +7,8 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 # import matplotlib.colors as colors
 import fast_tmfg
-import Graph_Theory_Functions
 import Dual
+import Graph_Theory_Functions
 import os
 import time
 from itertools import combinations
@@ -99,10 +99,9 @@ def simulate_dual(sims: int, seed: int, stocks: list[str], begin_data_date: str,
     stock_percent_changes = {}
     stock_dfs = {}
     for s in stocks:
-        df = yf.download(s, start="1970-01-02", end=sell2, interval="1d")
-
-        df = df.loc[df.index <= sell2]
+        df = yf.download(s, start="1970-01-02", end=pd.Timestamp(sell2)+pd.Timedelta(days=1), interval="1d")
         df = df.loc[df.index >= begin_data_date]
+        
         print(df)
         stock_dfs[s] = df
         # df = df.loc[df.index <= buy_date]
