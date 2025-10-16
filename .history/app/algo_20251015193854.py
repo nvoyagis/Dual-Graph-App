@@ -7,16 +7,16 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 # import matplotlib.colors as colors
 import fast_tmfg
-from . import Dual
-from . import Graph_Theory_Functions
+import Dual
+import Graph_Theory_Functions
 import os
 import time
 from itertools import combinations
-from . import Charts
+import Charts
 # import ta
 # from . import Database
 # from . import ML_Analysis
-from . import TMFG_Analysis
+import TMFG_Analysis
 import scipy
 import yfinance as yf
 
@@ -453,6 +453,9 @@ def simulate_dual(sims: int, seed: int, stocks: list[str], begin_data_date: str,
             # Use pd.Timestamp for the date lookup
             # target_date1 = pd.Timestamp(buy_date)
             # target_date2 = pd.Timestamp(random_sell_date)
+
+            target_date1 = pd.to_datetime(buy_date)
+            target_date2 = pd.to_datetime(random_sell_date)
 
             print(df)
             open_value = df.loc[buy_date, 'Open']

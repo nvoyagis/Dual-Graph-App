@@ -7,16 +7,16 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 # import matplotlib.colors as colors
 import fast_tmfg
-from . import Dual
-from . import Graph_Theory_Functions
+import Dual
+import Graph_Theory_Functions
 import os
 import time
 from itertools import combinations
-from . import Charts
+import Charts
 # import ta
 # from . import Database
 # from . import ML_Analysis
-from . import TMFG_Analysis
+import TMFG_Analysis
 import scipy
 import yfinance as yf
 
@@ -59,10 +59,9 @@ def sort_by_growth(stock_list: list[str], day1: str, day2: str):
 
         day1 = pd.to_datetime(day1)
         day2 = pd.to_datetime(day2)
-        
-        day1_price = (df.loc[day1, 'Open']).iloc[0]
-        print(day1_price)
-        day2_price = (df.loc[day2, 'Close']).iloc[0]
+
+        day1_price = (df.loc[df.index == day1, 'Open']).iloc[0]
+        day2_price = (df.loc[df.index == day2, 'Close']).iloc[0]
         change = (day2_price - day1_price) / day1_price
         growth_tracker[stock] = change
 
@@ -439,24 +438,18 @@ def simulate_dual(sims: int, seed: int, stocks: list[str], begin_data_date: str,
             portfolio_returns.append(random_period_portfolio_percent_change)
             
 
-            df = yf.download('SPX', start="1970-01-02", end=pd.Timestamp(sell2)+pd.Timedelta(days=5), interval="1d")
-            df = pd.read_csv(
-                            f'app/Data/SPX.csv',
-                            parse_dates=['Date'],
-                            date_format='%m/%d/%y')
-            df.set_index('Date', inplace=True)
-            # df.columns = df.columns.str.strip()
+            df = yf.download('SPX', start="1970-01-02", end=pd.Timestamp(sell2)+pd.Timedelta(days=1), interval="1d")
+            df.columns = df.columns.str.strip()
 
             # Set Date as index
-            # df.set_index('Date', inplace=True)
+            df.set_index('Date', inplace=True)
 
             # Use pd.Timestamp for the date lookup
-            # target_date1 = pd.Timestamp(buy_date)
-            # target_date2 = pd.Timestamp(random_sell_date)
+            target_date1 = pd.Timestamp(buy_date)
+            target_date2 = pd.Timestamp(random_sell_date)
 
-            print(df)
-            open_value = df.loc[buy_date, 'Open']
-            close_value = df.loc[random_sell_date, 'Close']
+            open_value = df.loc[target_date1, 'Open']
+            close_value = df.loc[target_date2, 'Close']
             SPX_percent_change = (close_value - open_value)/open_value * 100
             if random_period_portfolio_percent_change > SPX_percent_change:
                 SPX_beat_count += 1

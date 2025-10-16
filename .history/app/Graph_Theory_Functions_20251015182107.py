@@ -3,7 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import networkx as nx
 import scipy
-from . import Charts
+import Charts
 import yfinance as yf
 # import riskfolio as rf
 
@@ -19,7 +19,7 @@ def get_weight_mat(stock_list: list[str], begin_data_date: str, cutoff: str):
     # Label complete graph & create a percent change DataFrame.
     for stock in stock_list:
         # Create DataFrame for a given stock.
-        df = yf.download(stock, start="1970-01-02", end=pd.Timestamp(cutoff)+pd.Timedelta(days=1), interval="1d")
+        df = pd.read_csv(f'app/Data2015-2025/HistoricalPrices 2015 - 2025, {stock}.csv', parse_dates=['Date'], date_format='%m/%d/%Y')
         df = yf.download(stock, start=begin_data_date, end=cutoff, interval="1d")
         print(df)
         # Remove some recent data to analyze profits in the past
