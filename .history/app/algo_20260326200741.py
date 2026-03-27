@@ -7,20 +7,16 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 # import matplotlib.colors as colors
 import fast_tmfg
-# import Dual
-from . import Dual
-# import Graph_Theory_Functions
-from . import Graph_Theory_Functions
+import Dual
+import Graph_Theory_Functions
 import os
 import time
 from itertools import combinations
-# import Charts
-from . import Charts
+import Charts
 # import ta
 # from . import Database
 # from . import ML_Analysis
-# import TMFG_Analysis
-from . import TMFG_Analysis
+import TMFG_Analysis
 import scipy
 import yfinance as yf
 

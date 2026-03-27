@@ -7,20 +7,16 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 # import matplotlib.colors as colors
 import fast_tmfg
-# import Dual
-from . import Dual
-# import Graph_Theory_Functions
-from . import Graph_Theory_Functions
+import Dual
+import Graph_Theory_Functions
 import os
 import time
 from itertools import combinations
-# import Charts
-from . import Charts
+import Charts
 # import ta
 # from . import Database
 # from . import ML_Analysis
-# import TMFG_Analysis
-from . import TMFG_Analysis
+import TMFG_Analysis
 import scipy
 import yfinance as yf
 
@@ -57,7 +53,7 @@ def sort_by_growth(stock_list: list[str], day1: str, day2: str):
         # Create DataFrame for a given stock
         # print(df)
         # df['Date'] = pd.to_datetime(df['Date'])
-        df = all_dfs.xs(stock, axis=1, level=1).copy()
+        df = all_dfs.xs(s, axis=1, level=1).copy()
         df.index = pd.to_datetime(df.index, errors="coerce")
         # Remove spaces in column names
         # df.columns = df.columns.str.strip()
@@ -65,9 +61,9 @@ def sort_by_growth(stock_list: list[str], day1: str, day2: str):
         day1 = pd.to_datetime(day1)
         day2 = pd.to_datetime(day2)
         
-        day1_price = (df.loc[day1, 'Open'])
+        day1_price = (df.loc[day1, 'Open']).iloc[0]
         print(day1_price)
-        day2_price = (df.loc[day2, 'Close'])
+        day2_price = (df.loc[day2, 'Close']).iloc[0]
         change = (day2_price - day1_price) / day1_price
         growth_tracker[stock] = change
 
@@ -107,8 +103,9 @@ def simulate_dual(sims: int, seed: int, stocks: list[str], begin_data_date: str,
     stock_percent_changes = {}
     stock_dfs = {}
     all_dfs = yf.download(tickers=stocks, start="1970-01-02", end=pd.Timestamp(sell2)+pd.Timedelta(days=1), interval="1d")
+    df = df.loc[df.index >= begin_data_date]
     for s in stocks:
-        df = all_dfs.xs(s, axis=1, level=1).copy()
+        df = all_dfs[s].copy()
         df = df.loc[df.index >= begin_data_date]
         
         # print(df)

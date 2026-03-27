@@ -7,20 +7,16 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 # import matplotlib.colors as colors
 import fast_tmfg
-# import Dual
-from . import Dual
-# import Graph_Theory_Functions
-from . import Graph_Theory_Functions
+import Dual
+import Graph_Theory_Functions
 import os
 import time
 from itertools import combinations
-# import Charts
-from . import Charts
+import Charts
 # import ta
 # from . import Database
 # from . import ML_Analysis
-# import TMFG_Analysis
-from . import TMFG_Analysis
+import TMFG_Analysis
 import scipy
 import yfinance as yf
 
@@ -107,8 +103,9 @@ def simulate_dual(sims: int, seed: int, stocks: list[str], begin_data_date: str,
     stock_percent_changes = {}
     stock_dfs = {}
     all_dfs = yf.download(tickers=stocks, start="1970-01-02", end=pd.Timestamp(sell2)+pd.Timedelta(days=1), interval="1d")
+    df = df.loc[df.index >= begin_data_date]
     for s in stocks:
-        df = all_dfs.xs(s, axis=1, level=1).copy()
+        df = all_dfs[s].copy()
         df = df.loc[df.index >= begin_data_date]
         
         # print(df)
