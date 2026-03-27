@@ -454,12 +454,9 @@ def simulate_dual(sims: int, seed: int, stocks: list[str], begin_data_date: str,
             # target_date1 = pd.Timestamp(buy_date)
             # target_date2 = pd.Timestamp(random_sell_date)
 
-            target_date1 = pd.to_datetime(buy_date)
-            target_date2 = pd.to_datetime(random_sell_date)
-
             print(df)
-            open_value = df.loc[target_date1, 'Open']
-            close_value = df.loc[target_date2, 'Close']
+            open_value = df.loc[buy_date, 'Open']
+            close_value = df.loc[random_sell_date, 'Close']
             SPX_percent_change = (close_value - open_value)/open_value * 100
             if random_period_portfolio_percent_change > SPX_percent_change:
                 SPX_beat_count += 1
@@ -868,5 +865,5 @@ def simulate_dual(sims: int, seed: int, stocks: list[str], begin_data_date: str,
     # Graphing.tmfg_single_bar_graph(TMFG_pagerank, 'Pagerank')
 
 
-stocks = ['DIS', 'KO', 'ADBE', 'MRK', 'KMI', 'AAPL', 'JNJ', 'CVS', 'COST', 'T', 'BA', 'EA', 'HAS', 'HD', 'HSY', 'LLY', 'NFLX', 'NKE', 'V', 'JPM']
-simulate_dual(1, 1, stocks, '2023-01-03', '2023-01-31', '2023-02-01', '2023-02-28')
+stocks = ['CHRW', 'DIS', 'KO', 'ADBE', 'MRK', 'KMI', 'AAPL', 'JNJ', 'CVS', 'COST', 'T', 'BA', 'EA', 'HAS', 'HD', 'HSY', 'LLY', 'NFLX', 'NKE', 'V', 'JPM', 'AMGN']
+simulate_dual(1, 1, stocks, '2023-01-03', '2023-01-31', '2023-02-01', '2026-02-28')

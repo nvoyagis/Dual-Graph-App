@@ -7,16 +7,16 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 # import matplotlib.colors as colors
 import fast_tmfg
-import Dual
-import Graph_Theory_Functions
+from . import Dual
+from . import Graph_Theory_Functions
 import os
 import time
 from itertools import combinations
-import Charts
+from . import Charts
 # import ta
 # from . import Database
 # from . import ML_Analysis
-import TMFG_Analysis
+from . import TMFG_Analysis
 import scipy
 import yfinance as yf
 
@@ -440,6 +440,11 @@ def simulate_dual(sims: int, seed: int, stocks: list[str], begin_data_date: str,
             
 
             df = yf.download('SPX', start="1970-01-02", end=pd.Timestamp(sell2)+pd.Timedelta(days=5), interval="1d")
+            df = pd.read_csv(
+                            f'app/Data/SPX.csv',
+                            parse_dates=['Date'],
+                            date_format='%m/%d/%y')
+            df.set_index('Date', inplace=True)
             # df.columns = df.columns.str.strip()
 
             # Set Date as index
@@ -449,12 +454,9 @@ def simulate_dual(sims: int, seed: int, stocks: list[str], begin_data_date: str,
             # target_date1 = pd.Timestamp(buy_date)
             # target_date2 = pd.Timestamp(random_sell_date)
 
-            target_date1 = pd.to_datetime(buy_date)
-            target_date2 = pd.to_datetime(random_sell_date)
-
             print(df)
-            open_value = df.loc[target_date1, 'Open']
-            close_value = df.loc[target_date2, 'Close']
+            open_value = df.loc[buy_date, 'Open']
+            close_value = df.loc[random_sell_date, 'Close']
             SPX_percent_change = (close_value - open_value)/open_value * 100
             if random_period_portfolio_percent_change > SPX_percent_change:
                 SPX_beat_count += 1

@@ -7,8 +7,8 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 # import matplotlib.colors as colors
 import fast_tmfg
-import Graph_Theory_Functions
 import Dual
+import Graph_Theory_Functions
 import os
 import time
 from itertools import combinations
@@ -50,16 +50,19 @@ def sort_by_growth(stock_list: list[str], day1: str, day2: str):
     # Calculate the growth of each stock between day1 and day2
     for stock in stock_list:
         # Create DataFrame for a given stock
-        df = pd.read_csv(f'app/Data2015-2025/HistoricalPrices 2015 - 2025, {stock}.csv', parse_dates=['Date'], date_format='%m/%d/%Y')
-        df['Date'] = pd.to_datetime(df['Date'])
+        df = yf.download(stock, start="1970-01-02", end=pd.Timestamp(day2)+pd.Timedelta(days=1), interval="1d")
+        print(df)
+        # df['Date'] = pd.to_datetime(df['Date'])
+        df.index = pd.to_datetime(df.index, errors="coerce")
         # Remove spaces in column names
-        df.columns = df.columns.str.strip()
+        # df.columns = df.columns.str.strip()
 
         day1 = pd.to_datetime(day1)
         day2 = pd.to_datetime(day2)
-
-        day1_price = (df.loc[df['Date'] == day1, 'Open']).iloc[0]
-        day2_price = (df.loc[df['Date'] == day2, 'Close']).iloc[0]
+        
+        day1_price = (df.loc[day1, 'Open']).iloc[0]
+        print(day1_price)
+        day2_price = (df.loc[day2, 'Close']).iloc[0]
         change = (day2_price - day1_price) / day1_price
         growth_tracker[stock] = change
 
@@ -276,8 +279,7 @@ def simulate_dual(sims: int, seed: int, stocks: list[str], begin_data_date: str,
     
     # Generate random sell dates using a random stock (doesn't matter which one since all stocks use the same dates)
 
-    stock='AAPL'
-    df = pd.read_csv(f'app/Data2015-2025/HistoricalPrices 2015 - 2025, {stock}.csv', parse_dates=['Date'], date_format='%m/%d/%y')
+    df = yf.download('AAPL', start="1970-01-02", end=pd.Timestamp(sell2)+pd.Timedelta(days=1), interval="1d")
     df.reset_index(inplace=True)
     df['Date'] = pd.to_datetime(df['Date'], format='%m/%d/%y', errors='coerce')
     print(df)
@@ -437,21 +439,24 @@ def simulate_dual(sims: int, seed: int, stocks: list[str], begin_data_date: str,
             portfolio_returns.append(random_period_portfolio_percent_change)
             
 
-            df = pd.read_csv(
-                f'app/Data2015-2025/HistoricalPrices 2015 - 2025, SPX.csv',
-                parse_dates=['Date'],
-                date_format='%m/%d/%y')
-            df.columns = df.columns.str.strip()
+            df = yf.download('^GSPC', start="1970-01-02", end=pd.Timestamp(sell2)+pd.Timedelta(days=5), interval="1d")
+            # df = pd.read_csv(
+            #                 f'app/Data/SPX.csv',
+            #                 parse_dates=['Date'],
+            #                 date_format='%m/%d/%y')
+            # df.set_index('Date', inplace=True)
+            # df.columns = df.columns.str.strip()
 
             # Set Date as index
-            df.set_index('Date', inplace=True)
+            # df.set_index('Date', inplace=True)
 
             # Use pd.Timestamp for the date lookup
-            target_date1 = pd.Timestamp(buy_date)
-            target_date2 = pd.Timestamp(random_sell_date)
+            # target_date1 = pd.Timestamp(buy_date)
+            # target_date2 = pd.Timestamp(random_sell_date)
 
-            open_value = df.loc[target_date1, 'Open']
-            close_value = df.loc[target_date2, 'Close']
+            print(df)
+            open_value = float(df.loc[buy_date, 'Open'])
+            close_value = float(df.loc[random_sell_date, 'Close'])
             SPX_percent_change = (close_value - open_value)/open_value * 100
             if random_period_portfolio_percent_change > SPX_percent_change:
                 SPX_beat_count += 1
@@ -860,5 +865,5 @@ def simulate_dual(sims: int, seed: int, stocks: list[str], begin_data_date: str,
     # Graphing.tmfg_single_bar_graph(TMFG_pagerank, 'Pagerank')
 
 
-stocks = ['DIS', 'KO', 'ADBE', 'MRK', 'KMI', 'AAPL', 'JNJ', 'CVS', 'COST', 'T', 'BA', 'EA', 'HAS', 'HD', 'HSY', 'LLY', 'NFLX', 'NKE', 'V', 'JPM']
-simulate_dual(5, 1, stocks, '2023-01-03', '2023-01-31', '2023-02-01', '2023-02-28')
+stocks = ['CHRW', 'DIS', 'KO', 'ADBE', 'MRK', 'KMI', 'AAPL', 'JNJ', 'CVS', 'COST', 'T', 'BA', 'EA', 'HAS', 'HD', 'HSY', 'LLY', 'NFLX', 'NKE', 'V', 'JPM', 'AMGN']
+simulate_dual(1, 1, stocks, '2023-01-03', '2023-01-31', '2023-02-01', '2026-02-28')
